@@ -1,6 +1,9 @@
 package model;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class EncryptionProgram {
@@ -39,6 +42,8 @@ public class EncryptionProgram {
         Collections.shuffle(shuffledList);
         System.out.println("*A new Key has been generated*");
     }
+
+
     private void getKey(){
         System.out.println("Key : ");
         for(Character x:list){
@@ -52,7 +57,6 @@ public class EncryptionProgram {
     }
 
     public String encrypt(String text){
-
         letters = text.toCharArray();
 
         for(int i=0;i<letters.length;i++){
@@ -85,6 +89,29 @@ public class EncryptionProgram {
         return displayResult(letters);
     }
 
+    public void save(String text){
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File("~"));
+
+        if(fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File file;
+            PrintWriter fileOut = null;
+
+            file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+
+            try {
+                fileOut = new PrintWriter(file);
+                fileOut.println(text);
+            }
+            catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+            finally {
+                assert fileOut != null;
+                fileOut.close();
+            }
+        }
+    }
     private void quit(){
         System.out.println("Good bye :)");
         System.exit(0);

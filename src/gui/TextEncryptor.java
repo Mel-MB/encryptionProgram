@@ -3,8 +3,7 @@ import model.EncryptionProgram;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class TextEncryptor extends JFrame implements ActionListener {
     EncryptionProgram model;
@@ -12,8 +11,9 @@ public class TextEncryptor extends JFrame implements ActionListener {
     TextArea decryptedTextArea;
     TextArea encryptedTextArea;
 
-    JButton encryptButton;
-    JButton decryptButton;
+    JPanel commandPanel;
+    JButton encryptButton = new Button("Encrypt →", "encrypt", this);;
+    JButton decryptButton = new Button("← Decrypt", "decrypt", this);;
 
 
     public TextEncryptor(EncryptionProgram encryptionProgram){
@@ -21,24 +21,23 @@ public class TextEncryptor extends JFrame implements ActionListener {
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Encryptor");
-        this.setSize(1000, 700);
+        this.setSize(1200, 700);
         this.setLayout(new FlowLayout(FlowLayout.CENTER,0,0));
         this.setLocationRelativeTo(null);
 
-        decryptedTextArea = new TextArea();
-        encryptedTextArea = new TextArea();
+        commandPanel = new JPanel(new GridLayout(2,1));
+        setDefaultCommands(commandPanel);
 
 
-        JPanel commandPanel = new JPanel(new GridLayout(2,1));
-        encryptButton = new Button("Encrypt →", "encrypt", this);
-        decryptButton = new Button("← Decrypt", "decrypt", this);
-        commandPanel.add(encryptButton);
-        commandPanel.add(decryptButton);
+        decryptedTextArea = new TextArea(encryptButton);
+        encryptedTextArea = new TextArea(decryptButton);
+
 
         this.add(decryptedTextArea);
         this.add(commandPanel);
         this.add(encryptedTextArea);
 
+        this.pack();
         this.setVisible(true);
     }
 
@@ -47,12 +46,53 @@ public class TextEncryptor extends JFrame implements ActionListener {
         switch (e.getActionCommand()){
             case "encrypt":
                 encryptedTextArea.setTextContent(model.encrypt(decryptedTextArea.getTextContent()));
+                changeActions(new Button("<html><center>"+"Save "+"<br>"+"encrypted data"+"</center></html>","save /\n encrypted",this));
                 break;
+
             case "decrypt":
                 decryptedTextArea.setTextContent(model.decrypt(encryptedTextArea.getTextContent()));
+                changeActions(new Button("Save decrypted file","save /\n decrypted",this));
+                break;
+
+            case "save encrypted":
+                model.save(encryptedTextArea.getTextContent());
+                break;
+
+            case "save decrypted":
+                model.save(decryptedTextArea.getTextContent());
+                break;
+
+            case "refresh":
+                decryptedTextArea.setTextContent("");
+                encryptedTextArea.setTextContent("");
+                setDefaultCommands(commandPanel);
                 break;
             default:
                 break;
         }
+
+    }
+
+    private void changeActions(JButton button){
+        JButton refreshButton = new Button("Refresh","refresh",this);
+        commandPanel.removeAll();
+
+        commandPanel.add(button);
+        commandPanel.add(refreshButton);
+
+        commandPanel.validate();
+        commandPanel.repaint();
+    }
+
+    private void setDefaultCommands(JPanel parentElement){
+        parentElement.removeAll();
+
+        parentElement.add(encryptButton);
+        encryptButton.setEnabled(false);
+        parentElement.add(decryptButton);
+        decryptButton.setEnabled(false);
+
+        parentElement.validate();
+        parentElement.repaint();
     }
 }
